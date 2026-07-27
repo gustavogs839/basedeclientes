@@ -23,6 +23,7 @@ const nomeInput = document.getElementById('nome');
 const telefoneInput = document.getElementById('telefone');
 const emailInput = document.getElementById('email');
 const meioCaptacaoInput = document.getElementById('meio-captacao');
+const anotacoesInput = document.getElementById('anotacoes');
 const formError = document.getElementById('form-error');
 const formTitle = document.getElementById('form-title');
 const submitBtn = document.getElementById('submit-btn');
@@ -89,6 +90,7 @@ function render() {
       <div class="cliente-info">
         <strong>${escapeHtml(c.nome)}</strong>
         <span>${formatTelefone(c.telefone)}${c.email ? ' · ' + escapeHtml(c.email) : ''}${c.meio_captacao ? ' · ' + escapeHtml(c.meio_captacao) : ''}</span>
+        ${c.anotacoes ? `<p class="anotacoes">${escapeHtml(c.anotacoes)}</p>` : ''}
       </div>
       <div class="cliente-actions">
         <a class="btn-whatsapp" href="${whatsappLink(c.telefone)}" target="_blank" rel="noopener">WhatsApp</a>
@@ -121,6 +123,7 @@ form.addEventListener('submit', async (e) => {
   const telefone = telefoneInput.value.trim().replace(/\D/g, '');
   const email = emailInput.value.trim() || null;
   const meio_captacao = meioCaptacaoInput.value || null;
+  const anotacoes = anotacoesInput.value.trim() || null;
 
   if (!nome) return showError('Nome é obrigatório.');
   if (!telefone) return showError('Telefone é obrigatório.');
@@ -129,9 +132,16 @@ form.addEventListener('submit', async (e) => {
 
   try {
     if (id) {
-      await updateDoc(doc(db, 'clientes', id), { nome, telefone, email, meio_captacao });
+      await updateDoc(doc(db, 'clientes', id), { nome, telefone, email, meio_captacao, anotacoes });
     } else {
-      await addDoc(clientesCol, { nome, telefone, email, meio_captacao, criado_em: serverTimestamp() });
+      await addDoc(clientesCol, {
+        nome,
+        telefone,
+        email,
+        meio_captacao,
+        anotacoes,
+        criado_em: serverTimestamp(),
+      });
     }
     resetForm();
   } catch (err) {
@@ -155,6 +165,7 @@ lista.addEventListener('click', async (e) => {
     telefoneInput.value = cliente.telefone;
     emailInput.value = cliente.email || '';
     meioCaptacaoInput.value = cliente.meio_captacao || '';
+    anotacoesInput.value = cliente.anotacoes || '';
     formTitle.textContent = 'Editar cliente';
     submitBtn.textContent = 'Salvar alterações';
     cancelBtn.hidden = false;
