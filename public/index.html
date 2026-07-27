@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Base de Clientes</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Base de Clientes</h1>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2 id="form-title">Novo cliente</h2>
+      <form id="cliente-form">
+        <input type="hidden" id="cliente-id" />
+
+        <label for="nome">Nome *</label>
+        <input type="text" id="nome" required placeholder="Nome do cliente" />
+
+        <label for="telefone">Telefone *</label>
+        <input type="tel" id="telefone" required placeholder="(11) 99999-9999" />
+
+        <label for="email">E-mail (opcional)</label>
+        <input type="email" id="email" placeholder="cliente@email.com" />
+
+        <label for="meio-captacao">Meio de captação (opcional)</label>
+        <select id="meio-captacao">
+          <option value="">Selecione...</option>
+          <option value="Indicação">Indicação</option>
+          <option value="Site">Site</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Google">Google</option>
+          <option value="Portal Imobiliário">Portal Imobiliário</option>
+          <option value="Loja física">Loja física</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Ação promotora">Ação promotora</option>
+          <option value="100bug">100bug</option>
+          <option value="Outro">Outro</option>
+        </select>
+
+        <p id="form-error" class="error" hidden></p>
+
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">Cadastrar</button>
+          <button type="button" id="cancel-btn" hidden>Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2>Clientes</h2>
+        <input type="search" id="search" placeholder="Buscar por nome..." />
+      </div>
+      <div id="lista" class="lista"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
