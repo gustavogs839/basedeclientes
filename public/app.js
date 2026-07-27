@@ -1,3 +1,22 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+} from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+import { firebaseConfig } from './firebase-config.js';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const clientesCol = collection(db, 'clientes');
+
 const form = document.getElementById('cliente-form');
 const idInput = document.getElementById('cliente-id');
 const nomeInput = document.getElementById('nome');
@@ -48,6 +67,12 @@ function formatTelefone(telefone) {
   return d;
 }
 
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function render() {
   const termo = search.value.trim().toLowerCase();
   const filtrados = clientes.filter((c) => c.nome.toLowerCase().includes(termo));
@@ -76,47 +101,42 @@ function render() {
     .join('');
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-async function carregarClientes() {
-  const res = await fetch('/api/clientes');
-  clientes = await res.json();
-  render();
-}
+const clientesQuery = query(clientesCol, orderBy('criado_em', 'desc'));
+onSnapshot(
+  clientesQuery,
+  (snapshot) => {
+    clientes = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    render();
+  },
+  (err) => {
+    showError('Erro ao carregar clientes: ' + err.message);
+  }
+);
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearError();
 
-  const payload = {
-    nome: nomeInput.value.trim(),
-    telefone: telefoneInput.value.trim(),
-    email: emailInput.value.trim() || null,
-    meio_captacao: meioCaptacaoInput.value || null,
-  };
+  const nome = nomeInput.value.trim();
+  const telefone = telefoneInput.value.trim().replace(/\D/g, '');
+  const email = emailInput.value.trim() || null;
+  const meio_captacao = meioCaptacaoInput.value || null;
+
+  if (!nome) return showError('Nome é obrigatório.');
+  if (!telefone) return showError('Telefone é obrigatório.');
 
   const id = idInput.value;
-  const url = id ? `/api/clientes/${id}` : '/api/clientes';
-  const method = id ? 'PUT' : 'POST';
 
-  const res = await fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    showError(data.error || 'Erro ao salvar cliente.');
-    return;
+  try {
+    if (id) {
+      await updateDoc(doc(db, 'clientes', id), { nome, telefone, email, meio_captacao });
+    } else {
+      await addDoc(clientesCol, { nome, telefone, email, meio_captacao, criado_em: serverTimestamp() });
+    }
+    resetForm();
+  } catch (err) {
+    showError('Erro ao salvar cliente: ' + err.message);
   }
-
-  resetForm();
-  await carregarClientes();
 });
 
 cancelBtn.addEventListener('click', resetForm);
@@ -127,7 +147,7 @@ lista.addEventListener('click', async (e) => {
 
   const card = e.target.closest('.cliente');
   const id = card.dataset.id;
-  const cliente = clientes.find((c) => String(c.id) === id);
+  const cliente = clientes.find((c) => c.id === id);
 
   if (btn.dataset.action === 'editar') {
     idInput.value = cliente.id;
@@ -144,11 +164,12 @@ lista.addEventListener('click', async (e) => {
 
   if (btn.dataset.action === 'excluir') {
     if (!confirm(`Excluir o cliente "${cliente.nome}"?`)) return;
-    await fetch(`/api/clientes/${id}`, { method: 'DELETE' });
-    await carregarClientes();
+    try {
+      await deleteDoc(doc(db, 'clientes', id));
+    } catch (err) {
+      alert('Erro ao excluir: ' + err.message);
+    }
   }
 });
 
 search.addEventListener('input', render);
-
-carregarClientes();

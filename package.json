@@ -1,14 +1,10 @@
 {
   "name": "base-clientes-lopes",
   "version": "1.0.0",
-  "description": "Cadastro de clientes com botao de WhatsApp",
-  "main": "server.js",
+  "private": true,
+  "description": "Cadastro de clientes com botao de WhatsApp (Firebase Hosting + Firestore)",
   "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "pg": "^8.12.0"
+    "serve": "npx firebase-tools emulators:start --only hosting,firestore",
+    "deploy": "npx firebase-tools deploy"
   }
 }

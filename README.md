@@ -1,26 +1,33 @@
 # Base de Clientes
 
 Cadastro de clientes (nome, telefone, e-mail opcional, meio de captação opcional) com botão de WhatsApp.
+Site estático (Firebase Hosting) que fala direto com o banco (Firestore) pelo navegador — sem servidor próprio.
 
-## Rodando localmente
+**Atenção:** as regras do Firestore (`firestore.rules`) estão abertas — qualquer pessoa com o link do site
+pode ver e editar os clientes, sem login. Se depois quiser restringir, é só adicionar Firebase Authentication
+e trocar a regra `allow read, write: if true` por uma checagem de login.
 
-1. Crie um banco PostgreSQL gratuito no [Neon](https://neon.tech) e copie a *connection string*.
-2. Copie `.env.example` para `.env` e cole a connection string em `DATABASE_URL`.
-3. Instale as dependências e rode:
+## Configurando o projeto Firebase (uma vez)
+
+1. Acesse https://console.firebase.google.com e crie um projeto novo.
+2. No menu lateral, vá em **Build → Firestore Database** e clique em **Criar banco de dados** (modo produção, escolha uma região próxima, ex: `southamerica-east1`).
+3. Vá em **⚙️ Configurações do projeto → Seus apps → </> (Web)** e registre um app. Copie o objeto `firebaseConfig` mostrado.
+4. Cole esses valores em [`public/firebase-config.js`](public/firebase-config.js), substituindo os placeholders.
+5. Copie o **ID do projeto** (Project ID) e cole em [`.firebaserc`](.firebaserc), no lugar de `SUBSTITUA_PELO_ID_DO_PROJETO`.
+
+## Rodando localmente (emulador)
 
 ```
-npm install
-npm start
+npm run serve
 ```
 
-4. Abra `http://localhost:3000`.
+Abre em `http://localhost:5000` usando o emulador do Firestore (não mexe nos dados reais).
 
-## Publicando na nuvem (Render + Neon)
+## Publicando
 
-1. **Banco de dados (Neon)**: crie uma conta em https://neon.tech, crie um projeto e copie a *connection string* (algo como `postgresql://usuario:senha@host/banco?sslmode=require`).
-2. **Repositório**: suba este projeto para um repositório no GitHub (o `.env` não vai junto, está no `.gitignore`).
-3. **Deploy (Render)**: crie uma conta em https://render.com → **New Web Service** → conecte o repositório do GitHub.
-   - Build command: `npm install`
-   - Start command: `npm start`
-   - Em **Environment**, adicione a variável `DATABASE_URL` com a connection string do Neon.
-4. Após o deploy, o Render fornece uma URL pública (ex: `https://base-clientes-lopes.onrender.com`) para acessar o sistema de qualquer lugar.
+```
+npx firebase-tools login
+npx firebase-tools deploy
+```
+
+Ao final, o terminal mostra a URL pública, algo como `https://SEU_PROJETO.web.app`.
