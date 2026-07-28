@@ -33,18 +33,23 @@ body {
 }
 
 .topbar img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center;
+  height: 46px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.topbar .divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
   flex-shrink: 0;
 }
 
 .topbar h1 {
   margin: 0;
-  font-size: 1.25rem;
-  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--muted);
   letter-spacing: -0.01em;
 }
 
