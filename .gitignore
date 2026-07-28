@@ -1,4 +1,5 @@
 node_modules/
+imagens/
 .firebase/
 firebase-debug.log
 firestore-debug.log

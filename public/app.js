@@ -76,7 +76,11 @@ function escapeHtml(str) {
 
 function render() {
   const termo = search.value.trim().toLowerCase();
-  const filtrados = clientes.filter((c) => c.nome.toLowerCase().includes(termo));
+  const filtrados = clientes.filter(
+    (c) =>
+      c.nome.toLowerCase().includes(termo) ||
+      (c.anotacoes && c.anotacoes.toLowerCase().includes(termo))
+  );
 
   if (filtrados.length === 0) {
     lista.innerHTML = '<p class="empty">Nenhum cliente encontrado.</p>';
